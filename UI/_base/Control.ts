@@ -20,6 +20,7 @@ import ReactiveObserver = require('Core/ReactiveObserver');
 import isElementVisible = require('Core/helpers/Hcontrol/isElementVisible');
 
 import * as Logger from 'View/Logger';
+import {IControl, IControlOptions} from './interface/IControl';
 
 /**
  * @event Core/Control#activated Occurs when the component becomes active.
@@ -54,14 +55,14 @@ function matches(el: Element, selector: string): boolean {
     ).call(el, selector);
 }
 
-class Control {
+class Control implements IControl {
     private _mounted: boolean = false;
     private _unmounted: boolean = false;
     private _destroyed: boolean = false;
     private _active: boolean = false;
 
     private _instId: string;
-    private _options: any = null;
+    private _options: IControlOptions = null;
     private _internalOptions: Record<string, unknown> = null;
 
     /**
@@ -156,7 +157,7 @@ class Control {
         let savedInheritOptions = null;
         let environment = null;
 
-        this.saveInheritOptions = (opts: any) => {
+        this.saveInheritOptions = (opts: IControlOptions) => {
             savedInheritOptions = opts;
         };
 
@@ -259,7 +260,7 @@ class Control {
         }
     }
     /**
-     * @name Core/Control#readOnly
+     * @name UI/Base:Control#readOnly
      * @cfg {Boolean} Determines whether user can change control's value
      * (or interact with the control if its value is not editable).
      * @variant true User cannot change control's value (or interact with the control if its value is not editable).
@@ -284,7 +285,7 @@ class Control {
      */
 
     /**
-     * @name Core/Control#theme
+     * @name UI/Base:Control#theme
      * @cfg {String} Theme name. Depending on the theme, different stylesheets are loaded and
      * different styles are applied to the control.
      * @variant any Any value that was passed to the control.
@@ -328,7 +329,7 @@ class Control {
     }
 
     // Just save link to new options
-    saveOptions(options: any, controlNode: any = null): boolean {
+    saveOptions(options: IControlOptions, controlNode: any = null): boolean {
         this._options = options;
         if (controlNode) {
             this._container = controlNode.element;
@@ -707,12 +708,12 @@ class Control {
      * @see Documentation: Server render
      * @private
      */
-    protected _beforeMount<State>(options?: any, contexts?: object, receivedState?: State): Promise<State> | void {
+    protected _beforeMount<State>(options?: IControlOptions, contexts?: object, receivedState?: State): Promise<State> | void {
         // @ts-ignore
         return undefined;
     }
 
-    _beforeMountLimited(opts: any): Promise<any> | void {
+    _beforeMountLimited(opts: IControlOptions): Promise<any> | void {
         // включаем реактивность свойств, делаем здесь потому что в constructor рано, там еще может быть не
         // инициализирован _template, например если нативно объявлять класс контрола в typescript и указывать
         // _template на экземпляре, _template устанавливается сразу после вызова базового конструктора
@@ -813,7 +814,7 @@ class Control {
      * @see Documentation: Server render
      * @private
      */
-    protected _afterMount(options?: any, contexts?: any): void {
+    protected _afterMount(options?: IControlOptions, contexts?: any): void {
         // Do
     }
 
@@ -846,7 +847,7 @@ class Control {
      * @private
      */
 
-    __beforeUpdate(options: any): void {
+    __beforeUpdate(options: IControlOptions): void {
         if (options.theme !== this._options.theme) {
             this._manageStyles(options.theme, this._options.theme);
         }
@@ -921,7 +922,7 @@ class Control {
      * @see Documentation: Context
      * @private
      */
-    protected _afterUpdate(oldOptions?: any, oldContext?: any): void {
+    protected _afterUpdate(oldOptions?: IControlOptions, oldContext?: any): void {
         // Do
     }
 
